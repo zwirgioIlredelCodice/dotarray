@@ -19,90 +19,121 @@ while command != '!quit':
 	c_token = command.split()
 	
 	# execute
-	i = 0
+	i_token = 0
 	
-	while i < len(c_token):
+	while i_token < len(c_token):
 		
-		evaluated = False
+		if c_token[i_token] == '.': # append element in stack array
+			if c_token[i_token-1].isalnum():
+				stack[-1].append(int(c_token[i_token-1]))
+			
+			elif c_token[i_token-1].startswith("'") and c_token[i_token-1].endswith("'"):
+				string = c_token[i_token-1][1:-1]
+				stack[-1].append(string)
 		
-		if c_token[i] == '.': # append element in stack array
-			stack[-1].append(int(c_token[i-1]))
-		
-		elif c_token[i] == ':': #create stack array
+		elif c_token[i_token] == ':': #create stack array
 			stack.append([])
 			
-		elif c_token[i] == ',': #pop element in stack array
+		elif c_token[i_token] == ',': #pop element in stack array
 			stack[-1].pop()
 		
-		elif c_token[i] == ';': #pop stack array
+		elif c_token[i_token] == ';': #pop stack array
 			stack.pop()
 			
-		elif c_token[i] == ':,;;':
+		elif c_token[i_token] == ':,;;':
 			n = stack.pop()
 			n = n[0]
 			temp = stack.pop()
-			for i in temp:
-				stack.append([i, n])
+			for i_token in temp:
+				stack.append([i_token, n])
 		
-		elif c_token[i] == ':;:;':
+		elif c_token[i_token] == ':;:;':
 			temp2 = stack.pop()
 			temp1 = stack.pop()
-			for i in range(len(temp1)):
-				stack.append([temp1[i], temp2[i]])
+			for i_token in range(len(temp1)):
+				stack.append([temp1[i_token], temp2[i_token]])
 		
-		elif c_token[i] == '..:':
-			arr = []
-			for nums in stack:
-				arr.append(nums[0])
-			stack = [arr]
+		elif c_token[i_token] == '..:':
+			union = []
+			for arr in stack:
+				for num in arr:
+					union.append(num)
+			stack = [union]
 		
-		elif c_token[i] == '=@':
+		elif c_token[i_token] == '=@':
 			t = stack.pop()
-			variables[c_token[i-1]] = t
+			variables[c_token[i_token-1]] = t
 		
-		elif c_token[i] == '@=':
-			stack.append(variables[c_token[i-1]])
+		elif c_token[i_token] == '@=':
+			stack.append(variables[c_token[i_token-1]])
 			
-		elif c_token[i] == '+': 
+		elif c_token[i_token] == '+': 
 			s = stack
 			stack = []
 			for arr in s:
 				n = 0
-				for i in arr:
-					n += i
+				for i_arr in arr:
+					n += i_arr
 				stack.append([n])
 		
-		elif c_token[i] == '-':
+		elif c_token[i_token] == '-':
 			s = stack
 			stack = []
 			for arr in s:
-				n = 0
-				for i in arr:
-					n -= i
+				n = arr[0]
+				for i_arr in range(1,len(arr)):
+					n = n - arr[i_arr]
 				stack.append([n])
 		
-		elif c_token[i] == '=f{':
-			fn_name = c_token[i-1]
+		elif c_token[i_token] == '*':
+			s = stack
+			stack = []
+			for arr in s:
+				n = arr[0]
+				for i_arr in range(1,len(arr)):
+					n = n * arr[i_arr]
+				stack.append([n])
+		
+		elif c_token[i_token] == '/':
+			s = stack
+			stack = []
+			for arr in s:
+				n = arr[0]
+				for i_arr in range(1,len(arr)):
+					n = n / arr[i_arr]
+				stack.append([n])
+		
+		elif c_token[i_token] == '>':
+			s = stack
+			stack = []
+			for arr in s:
+				n = arr[0]
+				for i_arr in range(1,len(arr)):
+					n = int(n > arr[i_arr])
+				stack.append([n])
+		
+		elif c_token[i_token] == '=f{':
+			fn_name = c_token[i_token-1]
 			fn = []
-			i += 1
-			while c_token[i] != 'f}':
-				fn.append(c_token[i])
-				i += 1
+			i_token += 1
+			while c_token[i_token] != 'f}':
+				fn.append(c_token[i_token])
+				i_token += 1
 			functions[fn_name] = fn
 		
-		elif c_token[i] == 'f=':
-			fn_name = c_token[i-1]
+		elif c_token[i_token] == 'f=':
+			fn_name = c_token[i_token-1]
 			for t in functions[fn_name]:
 				c_token.append(t)
 		
-		elif c_token[i] == '!debug': #debug
+		elif c_token[i_token] == '!debug': #debug
 			print('stack =', stack)
 			print('variables=', variables)
 			
-		elif c_token[i] == '!fn': #debug
+		elif c_token[i_token] == '!fn': #debug
 			print(functions)
 		
-		i += 1
+		i_token += 1
 	
 	if len(stack) > 0:
 		print()

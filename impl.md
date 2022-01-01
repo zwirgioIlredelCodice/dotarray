@@ -16,12 +16,13 @@ array = 1, 2, 3, 4 e gli viene applicato + diventerà 1+2+3+4 = 10
 ## comandi specifici repl
 
 * **!quit** per terminare il programma
-* **!debug** per fare vedere lo stack
+* **!debug** per fare vedere lo stack e le variabili
+* **!fn** per far vedere le *circa* funzioni
 
 ## comandi manipolazione stack
 
 * **;** creazione array vuoto in stak
-* **,** aggiunge elemento all ultimo array dello stack
+* **,** aggiunge elemento all ultimo array dello stack, se è un numero lo aggionge come tale se è una stringa es. 'stringa' lo aggunge come una stringa
 * **:** cancella ultimo array dello stack
 * **.** cancella ultimo elemento array dello stack
 
