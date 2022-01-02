@@ -1,4 +1,11 @@
-# questo è veramente bello
+RED   = "\033[1;31m"  
+BLUE  = "\033[1;34m"
+CYAN  = "\033[1;36m"
+GREEN = "\033[0;32m"
+RESET = "\033[0;0m"
+BOLD    = "\033[;1m"
+REVERSE = "\033[;7m"
+
 print('benvenuto in Dotarray')
 
 stack = []
@@ -24,11 +31,13 @@ while command != '!quit':
 	while i_token < len(c_token):
 		
 		if c_token[i_token] == '.': # append element in stack array
-			if c_token[i_token-1].isalnum():
-				stack[-1].append(int(c_token[i_token-1]))
+			i_token += 1
+			if c_token[i_token].isalnum():
+				stack[-1].append(int(c_token[i_token]))
+				
 			
-			elif c_token[i_token-1].startswith("'") and c_token[i_token-1].endswith("'"):
-				string = c_token[i_token-1][1:-1]
+			elif c_token[i_token].startswith("'") and c_token[i_token].endswith("'"):
+				string = c_token[i_token][1:-1]
 				stack[-1].append(string)
 		
 		elif c_token[i_token] == ':': #create stack array
@@ -60,12 +69,14 @@ while command != '!quit':
 					union.append(num)
 			stack = [union]
 		
-		elif c_token[i_token] == '=@':
-			t = stack.pop()
-			variables[c_token[i_token-1]] = t
-		
 		elif c_token[i_token] == '@=':
-			stack.append(variables[c_token[i_token-1]])
+			i_token += 1
+			t = stack.pop()
+			variables[c_token[i_token]] = t
+		
+		elif c_token[i_token] == '=@':
+			i_token += 1
+			stack.append(variables[c_token[i_token]])
 			
 		elif c_token[i_token] == '+': 
 			s = stack
@@ -91,7 +102,7 @@ while command != '!quit':
 			for arr in s:
 				n = arr[0]
 				for i_arr in range(1,len(arr)):
-					n = n * arr[i_arr]
+					n *= arr[i_arr]
 				stack.append([n])
 		
 		elif c_token[i_token] == '/':
@@ -100,7 +111,7 @@ while command != '!quit':
 			for arr in s:
 				n = arr[0]
 				for i_arr in range(1,len(arr)):
-					n = n / arr[i_arr]
+					n /= arr[i_arr]
 				stack.append([n])
 		
 		elif c_token[i_token] == '>':
@@ -113,7 +124,8 @@ while command != '!quit':
 				stack.append([n])
 		
 		elif c_token[i_token] == '=f{':
-			fn_name = c_token[i_token-1]
+			i_token += 1
+			fn_name = c_token[i_token]
 			fn = []
 			i_token += 1
 			while c_token[i_token] != 'f}':
@@ -122,7 +134,8 @@ while command != '!quit':
 			functions[fn_name] = fn
 		
 		elif c_token[i_token] == 'f=':
-			fn_name = c_token[i_token-1]
+			i_token += 1
+			fn_name = c_token[i_token]
 			for t in functions[fn_name]:
 				c_token.append(t)
 		
@@ -132,6 +145,9 @@ while command != '!quit':
 			
 		elif c_token[i_token] == '!fn': #debug
 			print(functions)
+		
+		else:
+			print(RED,'token',c_token[i_token], 'not recognised !',RESET)
 		
 		i_token += 1
 	
