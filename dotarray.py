@@ -139,12 +139,28 @@ while command != '!quit':
 			for t in functions[fn_name]:
 				c_token.append(t)
 		
+		elif c_token[i_token] == '?{':
+			if stack[-1] == [0]:
+				while c_token[i_token] != '?}' and c_token[i_token] != '<?}':
+					i_token += 1
+		
+		elif c_token[i_token] == '?}':
+			i_token += 1
+		
+		elif c_token[i_token] == '<?}':
+			while c_token[i_token] != '?{':
+				i_token -= 1
+			i_token -= 1 # serve per eseguire '?{' così da ricontrollare tipo loop
+		
 		elif c_token[i_token] == '!debug': #debug
 			print('stack =', stack)
 			print('variables=', variables)
 			
 		elif c_token[i_token] == '!fn': #debug
 			print(functions)
+		
+		elif c_token[i_token] == '!print':
+			print(stack)
 		
 		else:
 			print(RED,'token',c_token[i_token], 'not recognised !',RESET)

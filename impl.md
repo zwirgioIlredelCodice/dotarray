@@ -18,6 +18,7 @@ array = 1, 2, 3, 4 e gli viene applicato + diventerà 1+2+3+4 = 10
 * **!quit** per terminare il programma
 * **!debug** per fare vedere lo stack e le variabili
 * **!fn** per far vedere le *circa* funzioni
+* **!print!** scrive lo stack
 
 ## comandi manipolazione stack
 
@@ -43,3 +44,17 @@ array = 1, 2, 3, 4 e gli viene applicato + diventerà 1+2+3+4 = 10
 * **=f{...}** per declararla, prende il token prima come nome e mette l'array di comandi in un dictionary sotto quel nome es. f1 =f{ 1 . f}
 
 * **f=** per usarla, prende l'array di comandi sotto quel nome dal dictionary e gli aggiunge alla lista dei comandi da esguire es. f1 f=
+
+## controllo flussi (if, while)
+in questo linguaggio di programmazione non ci sono i flussi convezionali ma li puoi creare
+
+* **?{** se l'ultimo elemento dello stack è diverso da (0) allora esegue i comandi al suo interno fino ad un **?}** o un **<?}**
+
+* **?}** chiude il blocco senza fare altro
+
+* **<?}** chiude il blocco ma ritorna al **?{** prima qundi riesegue **?{**
+
+### esempi
+* **if** `: . 1 ?{ . 4 + ?} !print` output: *((5))*
+
+* **while** `: . 5 ?{ . 1 - !print <?}` output: *((4))((3))((2))((1))((0))*
