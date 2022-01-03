@@ -1,4 +1,6 @@
 RED   = "\033[1;31m"  
+import sys
+
 BLUE  = "\033[1;34m"
 CYAN  = "\033[1;36m"
 GREEN = "\033[0;32m"
@@ -10,7 +12,6 @@ print('benvenuto in Dotarray')
 
 stack = []
 
-command = ''
 c_token = []
 
 evaluated = False
@@ -18,15 +19,16 @@ evaluated = False
 variables = {}
 functions = {}
 
-while command != '!quit':
-	
-	command = input('\t# ')
-	
+block_n = 0
+
+def execute(text):
 	# parse command
-	c_token = command.split()
+	c_token = text.split()
 	
 	# execute
 	i_token = 0
+	
+	global stack
 	
 	while i_token < len(c_token):
 		
@@ -141,13 +143,21 @@ while command != '!quit':
 		
 		elif c_token[i_token] == '?{':
 			if stack[-1] == [0]:
-				while c_token[i_token] != '?}' and c_token[i_token] != '<?}':
+				block_n += 1
+				
+				while c_token[i_token] != '?}' and c_token[i_token] != '<?}' and block_n != 0:
 					i_token += 1
 		
 		elif c_token[i_token] == '?}':
+			if block_n > 0:
+				block_n -= 1
 			i_token += 1
 		
 		elif c_token[i_token] == '<?}':
+			
+			if block_n > 0:
+				block_n -= 1
+			
 			while c_token[i_token] != '?{':
 				i_token -= 1
 			i_token -= 1 # serve per eseguire '?{' così da ricontrollare tipo loop
@@ -166,9 +176,108 @@ while command != '!quit':
 			print(RED,'token',c_token[i_token], 'not recognised !',RESET)
 		
 		i_token += 1
+
+		
+def repl():
 	
-	if len(stack) > 0:
-		print()
-		print(stack)
-		print()
+	command = ''
 	
+	while command != '!quit':
+		
+		command = input('\t# ')
+			
+		execute(command)
+		
+		if len(stack) > 0:
+			print()
+			print(stack)
+			print()
+
+def test():
+	global stack
+	global variables
+	global functions
+	
+	print('\ttest')
+	
+	execute(':')
+	if stack == [[]]:
+		print(GREEN,': passed',RESET)
+	else:
+		print(RED, ': not passed code= :',RESET)
+	
+	execute(';')
+	if stack == []:
+		print(GREEN,'; passed',RESET)
+	else:
+		print(RED, '; not passed code= ;',RESET)
+	
+	execute(': . 666')
+	if stack == [[666]]:
+		print(GREEN,'. passed',RESET)
+	else:
+		print(RED, '. not passed code= : . 666',RESET)
+	
+	stack = [[1, 2, 3,], [10]]
+	execute(':,;;')
+	if stack == [[1,10],[2,10],[3,10]]:
+		print(GREEN,':,;; passed',RESET)
+	else:
+		print(RED, ':,;; not passed code= :,;;',RESET)
+		
+	stack = [[1, 2, 3,], [10, 20, 30]]
+	execute(':;:;')
+	if stack == [[1,10],[2,20],[3,30]]:
+		print(GREEN,':;:; passed',RESET)
+	else:
+		print(RED, ':;:; not passed code= :;:;',RESET)
+	
+	stack = [[1,10],[2,20],[3,30]]
+	execute('..:')
+	if stack == [[1,10,2,20,3,30]]:
+		print(GREEN,'..: passed',RESET)
+	else:
+		print(RED, '..: not passed code= ..:',RESET)
+	
+	stack = [[1,10],[2,20],[3,30]]
+	execute('+')
+	if stack == [[11],[22],[33]]:
+		print(GREEN,'+ passed',RESET)
+	else:
+		print(RED, '+ not passed code= +',RESET)
+	
+	stack = [[1,10],[2,20],[3,30]]
+	execute('-')
+	if stack == [[-9],[-18],[-27]]:
+		print(GREEN,'- passed',RESET)
+	else:
+		print(RED, '- not passed code= -',RESET)
+	
+	stack = [[1,10],[2,20],[3,30]]
+	execute('*')
+	if stack == [[10],[40],[90]]:
+		print(GREEN,'* passed',RESET)
+	else:
+		print(RED, '* not passed code= *',RESET)
+		
+	stack = [[1,10],[2,20],[3,30]]
+	execute('/')
+	if stack == [[0.1],[0.1],[0.1]]:
+		print(GREEN,'+ passed',RESET)
+	else:
+		print(RED, '+ not passed code= +',RESET)
+	
+	stack = [[1,10],[20, 2],[3,30]]
+	execute('>')
+	if stack == [[0],[1],[0]]:
+		print(GREEN,'> passed',RESET)
+	else:
+		print(RED, '> not passed code= >',RESET)
+	
+if __name__ == '__main__':
+	if len(sys.argv) < 2:
+		repl()
+	elif sys.argv[1] == 'test':
+		test()
+	else:
+		print('arg not supported')
