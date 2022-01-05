@@ -1,6 +1,6 @@
-RED   = "\033[1;31m"  
 import sys
 
+RED   = "\033[1;31m"
 BLUE  = "\033[1;34m"
 CYAN  = "\033[1;36m"
 GREEN = "\033[0;32m"
@@ -197,82 +197,48 @@ def test():
 	global stack
 	global variables
 	global functions
+
+	t_code = [':', ';', ': . 666', ':,;;', ':;:;', '..:', '+', '-', '*', '/', '>']
+	t_in = [[], 
+			[[]],
+			[],
+			[[1, 2, 3,], 
+			[10]], 
+			[[1, 2, 3,], 
+			[10, 20, 30]], 
+			[[1,10],[2,20],[3,30]], 
+			[[1,10],[2,20],[3,30]], 
+			[[1,10],[2,20],[3,30]],
+			[[1,10],[2,20],[3,30]],
+			[[1,10],[2,20],[3,30]],
+			[[1,10],[20, 2],[3,30]]
+			]
+	t_output = [[[]],
+				[],
+				[[666]],
+				[[1,10],
+				[2,10],
+				[3,10]],
+				[[1,10],
+				[2,20],
+				[3,30]],
+				[[1,10,2,20,3,30]],
+				[[11],[22],[33]],
+				[[-9],[-18],[-27]],
+				[[10],[40],[90]],
+				[[0.1],[0.1],[0.1]],
+				[[0],[1],[0]]
+				]
 	
 	print('\ttest')
-	
-	execute(':')
-	if stack == [[]]:
-		print(GREEN,': passed',RESET)
-	else:
-		print(RED, ': not passed code= :',RESET)
-	
-	execute(';')
-	if stack == []:
-		print(GREEN,'; passed',RESET)
-	else:
-		print(RED, '; not passed code= ;',RESET)
-	
-	execute(': . 666')
-	if stack == [[666]]:
-		print(GREEN,'. passed',RESET)
-	else:
-		print(RED, '. not passed code= : . 666',RESET)
-	
-	stack = [[1, 2, 3,], [10]]
-	execute(':,;;')
-	if stack == [[1,10],[2,10],[3,10]]:
-		print(GREEN,':,;; passed',RESET)
-	else:
-		print(RED, ':,;; not passed code= :,;;',RESET)
-		
-	stack = [[1, 2, 3,], [10, 20, 30]]
-	execute(':;:;')
-	if stack == [[1,10],[2,20],[3,30]]:
-		print(GREEN,':;:; passed',RESET)
-	else:
-		print(RED, ':;:; not passed code= :;:;',RESET)
-	
-	stack = [[1,10],[2,20],[3,30]]
-	execute('..:')
-	if stack == [[1,10,2,20,3,30]]:
-		print(GREEN,'..: passed',RESET)
-	else:
-		print(RED, '..: not passed code= ..:',RESET)
-	
-	stack = [[1,10],[2,20],[3,30]]
-	execute('+')
-	if stack == [[11],[22],[33]]:
-		print(GREEN,'+ passed',RESET)
-	else:
-		print(RED, '+ not passed code= +',RESET)
-	
-	stack = [[1,10],[2,20],[3,30]]
-	execute('-')
-	if stack == [[-9],[-18],[-27]]:
-		print(GREEN,'- passed',RESET)
-	else:
-		print(RED, '- not passed code= -',RESET)
-	
-	stack = [[1,10],[2,20],[3,30]]
-	execute('*')
-	if stack == [[10],[40],[90]]:
-		print(GREEN,'* passed',RESET)
-	else:
-		print(RED, '* not passed code= *',RESET)
-		
-	stack = [[1,10],[2,20],[3,30]]
-	execute('/')
-	if stack == [[0.1],[0.1],[0.1]]:
-		print(GREEN,'+ passed',RESET)
-	else:
-		print(RED, '+ not passed code= +',RESET)
-	
-	stack = [[1,10],[20, 2],[3,30]]
-	execute('>')
-	if stack == [[0],[1],[0]]:
-		print(GREEN,'> passed',RESET)
-	else:
-		print(RED, '> not passed code= >',RESET)
+	for i in range(len(t_code)):
+
+		stack = t_in[i]
+		execute(t_code[i])
+		if stack == t_output[i]:
+			print(GREEN,t_code[i],'passed stack=',RESET, stack)
+		else:
+			print(RED, t_code[i],'not passed stack=',RESET, stack)
 	
 if __name__ == '__main__':
 	if len(sys.argv) < 2:
