@@ -1,4 +1,5 @@
 import sys
+import copy
 
 RED   = "\033[1;31m"
 BLUE  = "\033[1;34m"
@@ -19,14 +20,13 @@ evaluated = False
 variables = {}
 functions = {}
 
-block_n = 0
-
 def execute(text):
 	# parse command
 	c_token = text.split()
 	
 	# execute
 	i_token = 0
+	block_n = 0
 	
 	global stack
 	
@@ -34,12 +34,19 @@ def execute(text):
 		
 		if c_token[i_token] == '.': # append element in stack array
 			i_token += 1
-			if c_token[i_token].isalnum():
-				stack[-1].append(int(c_token[i_token]))
-				
+			is_float = False
+
+			try:
+				float(c_token[i_token])
+				is_float = True
+			except:
+				is_float = False
+
+			if is_float:
+				stack[-1].append(float(c_token[i_token]))
 			
-			elif c_token[i_token].startswith("'") and c_token[i_token].endswith("'"):
-				string = c_token[i_token][1:-1]
+			else:
+				string = c_token[i_token].replace('_', ' ')
 				stack[-1].append(string)
 		
 		elif c_token[i_token] == ':': #create stack array
@@ -78,7 +85,8 @@ def execute(text):
 		
 		elif c_token[i_token] == '=@':
 			i_token += 1
-			stack.append(variables[c_token[i_token]])
+			var = copy.deepcopy(variables[c_token[i_token]]) # bug strano cosi non passa per reference senno cambiai stack e cambiava anche var
+			stack.append(var)
 			
 		elif c_token[i_token] == '+': 
 			s = stack
@@ -116,6 +124,15 @@ def execute(text):
 					n /= arr[i_arr]
 				stack.append([n])
 		
+		elif c_token[i_token] == '%':
+			s = stack
+			stack = []
+			for arr in s:
+				n = arr[0]
+				for i_arr in range(1,len(arr)):
+					n %= arr[i_arr]
+				stack.append([n])
+		
 		elif c_token[i_token] == '>':
 			s = stack
 			stack = []
@@ -125,6 +142,78 @@ def execute(text):
 					n = int(n > arr[i_arr])
 				stack.append([n])
 		
+		elif c_token[i_token] == '>=':
+			s = stack
+			stack = []
+			for arr in s:
+				n = arr[0]
+				for i_arr in range(1,len(arr)):
+					n = int(n >= arr[i_arr])
+				stack.append([n])
+		
+		elif c_token[i_token] == '<':
+			s = stack
+			stack = []
+			for arr in s:
+				n = arr[0]
+				for i_arr in range(1,len(arr)):
+					n = int(n < arr[i_arr])
+				stack.append([n])
+		
+		elif c_token[i_token] == '<=':
+			s = stack
+			stack = []
+			for arr in s:
+				n = arr[0]
+				for i_arr in range(1,len(arr)):
+					n = int(n <= arr[i_arr])
+				stack.append([n])
+		
+		elif c_token[i_token] == '==':
+			s = stack
+			stack = []
+			for arr in s:
+				n = arr[0]
+				for i_arr in range(1,len(arr)):
+					n = int(n == arr[i_arr])
+				stack.append([n])
+
+		elif c_token[i_token] == 'and':
+			s = stack
+			stack = []
+			for arr in s:
+				n = arr[0]
+				for i_arr in range(1,len(arr)):
+					n = int(n & arr[i_arr])
+				stack.append([n])
+		
+		elif c_token[i_token] == 'or':
+			s = stack
+			stack = []
+			for arr in s:
+				n = arr[0]
+				for i_arr in range(1,len(arr)):
+					n = int(n | arr[i_arr])
+				stack.append([n])
+		
+		elif c_token[i_token] == 'xor':
+			s = stack
+			stack = []
+			for arr in s:
+				n = arr[0]
+				for i_arr in range(1,len(arr)):
+					n = int(n ^ arr[i_arr])
+				stack.append([n])
+		
+		elif c_token[i_token] == 'not':
+			s = stack
+			stack = []
+			for arr in s:
+				n = arr[0]
+				for i_arr in arr:
+					n = int(i_arr)
+				stack.append([n])
+
 		elif c_token[i_token] == '=f{':
 			i_token += 1
 			fn_name = c_token[i_token]
@@ -151,7 +240,6 @@ def execute(text):
 		elif c_token[i_token] == '?}':
 			if block_n > 0:
 				block_n -= 1
-			i_token += 1
 		
 		elif c_token[i_token] == '<?}':
 			
@@ -162,6 +250,11 @@ def execute(text):
 				i_token -= 1
 			i_token -= 1 # serve per eseguire '?{' così da ricontrollare tipo loop
 		
+		elif c_token[i_token] == '"': #coment
+			i_token += 1
+			while c_token[i_token] != '"':
+				i_token += 1
+
 		elif c_token[i_token] == '!debug': #debug
 			print('stack =', stack)
 			print('variables=', variables)
@@ -172,8 +265,11 @@ def execute(text):
 		elif c_token[i_token] == '!print':
 			print(stack)
 		
+		elif c_token[i_token] == '!quit':
+			pass
+		
 		else:
-			print(RED,'token',c_token[i_token], 'not recognised !',RESET)
+			print(RED,'token',c_token[i_token], 'not recognised at i_token', i_token, RESET)
 		
 		i_token += 1
 
@@ -182,13 +278,13 @@ def repl():
 	
 	command = ''
 	
-	while command != '!quit':
+	while command != '!quit': # L oop
 		
-		command = input('\t# ')
+		command = input('\t# ') # R eand
 			
-		execute(command)
+		execute(command) # E xecute
 		
-		if len(stack) > 0:
+		if len(stack) > 0: # P rint
 			print()
 			print(stack)
 			print()
@@ -239,11 +335,16 @@ def test():
 			print(GREEN,t_code[i],'passed stack=',RESET, stack)
 		else:
 			print(RED, t_code[i],'not passed stack=',RESET, stack)
-	
+
+def exec_file(filename):
+	f = open(filename, "r")
+	program = f.read()
+	execute(program)
+
 if __name__ == '__main__':
 	if len(sys.argv) < 2:
 		repl()
 	elif sys.argv[1] == 'test':
 		test()
 	else:
-		print('arg not supported')
+		exec_file(sys.argv[1])
